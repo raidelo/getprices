@@ -15,7 +15,7 @@ class Scrapper:
 
         self.__soup = None
 
-        self.debug_info = 0
+        self.debug_info = 1
 
     def gtn(self, string_):
         return print('%s %s'%(datetime.datetime.now().time(), string_)) if self.debug_info else None
@@ -24,7 +24,11 @@ class Scrapper:
         self.gtn('Initiating Scraping')
         start = time.time()
         self.gtn('Initiating Petition To ElToque\'s Page')
-        page_standard = requests.get(self.__url_standard)
+        try:
+            page_standard = requests.get(self.__url_standard)
+        except requests.RequestException:
+            print("error: compruebe su conexión a internet o cortafuegos")
+            exit(1)
         self.gtn('Petition To ElToque\'s Page Elapsed Time: %s ... Real Duration: %f'%(page_standard.elapsed, time.time()-start))
         self.gtn('Started Fiat Prices Fetching')
         self.__soup = bs4.BeautifulSoup(page_standard.content, 'html.parser')
@@ -73,7 +77,11 @@ class Scrapper:
             'period':'7D', 'trmi':'true'}
             start = time.time()
             self.gtn('Parsing USDT %s'%modes_cripto[mode])
-            response = requests.get(self.__url_cripto, params=params)
+            try:
+                response = requests.get(self.__url_cripto, params=params)
+            except requests.RequestException:
+                print("error: compruebe su conexión a internet o cortafuegos")
+                exit(1)
             self.gtn('Petition To Cripto Prices API Elapsed Time: %s ... Real Duration: %f'%(response.elapsed, time.time()-start))
             content = response.json()
             if len(content) == 0:
